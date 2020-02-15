@@ -1,0 +1,1 @@
+Customized openHAB2 installation 
