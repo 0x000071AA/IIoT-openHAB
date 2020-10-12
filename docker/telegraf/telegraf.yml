@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    networks:
+      - monitoring
+    environment:
+      HOST_PROC: /rootfs/proc
+      HOST_SYS: /rootfs/sys
+      HOST_ETC: /rootfs/etc
+      HOST_VAR: /rootfs/var
+    volumes:
+     - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+     - /sys:/rootfs/sys:ro
+     - /proc:/rootfs/proc:ro
+     - /etc:/rootfs/etc:ro
+     - /var:/rootfs/var:ro
+    deploy:
+      mode: global
+      labels:
+        - "traefik.enable=false"
+        - "traefik.tags=private"
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 2
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first  
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 100M
+        reservations:
+          cpus: '0.25'
+          memory: 400M
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "2"
+
+networks:
+  monitoring:

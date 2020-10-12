@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  registry:
+    container_name: local_registry
+    image: registry:2
+    ports:
+    - "5005:5005"
+    environment:
+      REGISTRY_HTTP_ADDR=0.0.0.0:5005
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+    volumes:
+      - /data:/var/lib/registry
+      - /certs:/certs
+    restart: always
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.tags=public"
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 2
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "2"

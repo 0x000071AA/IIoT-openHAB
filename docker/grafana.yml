@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring
+    volumes:
+      - grafana-volume:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_USER: 'admin'
+      GF_SECURITY_ADMIN_PASSWORD: 'admin'
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.tags=public"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+        - "traefik.http.routers.grafana.rule=Host(`deha-it-oh01`)"
+        - "traefik.http.routers.grafana.service=grafana"
+        - "traefik.http.routers.grafana.entrypoints=port3000"
+        #- "traefik.docker.network=traefik"
+      replicas: 3
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 2
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first  
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 100M
+        reservations:
+          cpus: '0.25'
+          memory: 400M
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "2"
+
+networks:
+  monitoring:
+
+volumes:
+  grafana-volume:
+    external: true
+

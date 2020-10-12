@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  openhab:
+    container_name: openhab
+    image: localhost:5005/openhab
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
+      - "./openhab_certificates:/openhab/certificates"
+      - "./openhab_backup:/openhab/conf/automation"
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+      - "8101:8101"
+      - "5007:5007"
+      - "4840:4840"
+      - "4843:4843"
+    environment:
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+    networks:
+      - default
+    restart: always
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.tags=public"
+        - "traefik.http.services.openhab.loadbalancer.server.port=8086"
+        - "traefik.http.routers.openhab.rule=Host(`deha-it-oh01`)"
+        - "traefik.http.routers.openhab.service=openhab "
+        - "traefik.http.routers.openhab.entrypoints=port8086"
+        #- "traefik.docker.network=traefik"
+
+        #- "traefik.tcp.routers.opc-app.entrypoints=opcua"
+        #- "traefik.tcp.routers.opc-app.rule=HostSNI(`tcp-example.com`)"
+      replicas: 2
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 2
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first  
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "2"
