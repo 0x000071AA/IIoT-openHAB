@@ -6,13 +6,15 @@ services:
     image: registry:2
     ports:
     - "5005:5005"
+    networks:
+      - default
     environment:
-      REGISTRY_HTTP_ADDR=0.0.0.0:5005
-      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
-      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5005
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/domain.key
     volumes:
       - /data:/var/lib/registry
-      - /certs:/certs
+      - certificates-vol:/certs
     restart: always
     deploy:
       labels:
@@ -24,7 +26,6 @@ services:
           cpus: '0.50'
           memory: 50M
         reservations:
-          cpus: '0.25'
           memory: 20M
       update_config:
         delay: 10s
@@ -39,3 +40,10 @@ services:
       options:
         max-size: 10m
         max-file: "2"
+
+networks:
+  default:
+
+volumes:
+  certificates-vol:
+    external: true

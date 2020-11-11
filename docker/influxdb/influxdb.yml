@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   influxdb:
-    image: influxdb
+    image: localhost:5005/influxdb
     container_name: influxdb
     restart: always
     ports:
@@ -9,13 +9,20 @@ services:
     networks:
       - monitoring
     volumes:
-      - influxdb-config:/etc/influxdb/influxdb.conf:ro
+      #- influxdb-config:/etc/influxdb/influxdb.conf:ro
       - influxdb-volume:/var/lib/influxdb
       - init.db/init.iql:/docker-entrypoint-initdb.d/
     environment:
-      - INFLUXDB_ADMIN_ENABLED: 'true'
-      - INFLUXDB_ADMIN_USER: 'admin'
-      - INFLUXDB_ADMIN_PASSWORD: 'admin'
+      - INFLUXDB_HTTP_HTTPS_ENABLED=false
+      #- INFLUXDB_HTTP_HTTPS_CERTIFICATE=/etc/ssl/influxdb-selfsigned.crt
+      #- INFLUXDB_HTTP_HTTPS_PRIVATE_KEY=/etc/ssl/influxdb-selfsigned.key
+      
+      - INFLUXDB_HTTP_ENABLED=true
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
     deploy:
       labels:
         - "traefik.enable=true"
@@ -37,9 +44,8 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 500M
+          memory: 512M
         reservations:
-          cpus: '0.25'
           memory: 400M
     logging:
       driver: json-file
@@ -51,8 +57,8 @@ networks:
   monitoring:
 
 volumes:
-  influxdb-config:
-    external: true
+  #influxdb-config:
+  #  external: true
   influxdb-volume:
     external: true
 

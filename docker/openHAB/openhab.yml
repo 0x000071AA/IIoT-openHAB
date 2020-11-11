@@ -30,13 +30,13 @@ services:
         - "traefik.tags=public"
         - "traefik.http.services.openhab.loadbalancer.server.port=8086"
         - "traefik.http.routers.openhab.rule=Host(`deha-it-oh01`)"
-        - "traefik.http.routers.openhab.service=openhab "
+        - "traefik.http.routers.openhab.service=openhab"
         - "traefik.http.routers.openhab.entrypoints=port8086"
         #- "traefik.docker.network=traefik"
 
         #- "traefik.tcp.routers.opc-app.entrypoints=opcua"
-        #- "traefik.tcp.routers.opc-app.rule=HostSNI(`tcp-example.com`)"
-      replicas: 2
+        #- "traefik.tcp.routers.opc-app.rule=HostSNI(`deha-it-oh01`)"
+      replicas: 1
       update_config:
         delay: 10s
         order: start-first
@@ -48,9 +48,8 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 500M
+          memory: 512M
         reservations:
-          cpus: '0.25'
           memory: 256M
     logging:
       driver: json-file

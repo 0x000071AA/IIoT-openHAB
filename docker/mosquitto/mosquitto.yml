@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  mosquitto:
+    container_name: mqtt_mosquitto
+    image: eclipse-mosquitto:1.6.12
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/data:/mosquitto/data
+    expose:
+      - "1883"
+    ports:
+      - "1883:1883"
+    networks:
+      - default
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 10s
+        order: start-first
+        parallelism: 2
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          memory: 20M
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "2"
+
+networks:
+  default:

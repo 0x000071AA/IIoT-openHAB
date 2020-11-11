@@ -88,7 +88,7 @@ VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_CERTIFICATES} ${OPENHAB_HOM
 # Adapt ports	
 EXPOSE ${OPENHAB_HTTP_PORT} ${OPENHAB_HTTPS_PORT} ${OPENHAB_OPC_PORT} ${OPENHAB_OPC_SECURE_PORT} 8101 5007
 
-HELACHECK --interval=20s --timeout=5s CMD curl --silent --fail http://localhost:5000/rest || exit 1
+HELACHECK --interval=20s --timeout=2s CMD curl --silent --fail http://localhost:5000/rest || exit 1
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
