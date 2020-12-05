@@ -35,8 +35,6 @@ ENV \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
-    OPENHAB_BACKUPS="/openhab/userdata/backup" \
-    OPENHAB_CONF="/openhab/conf" \
     OPENHAB_HOME="/openhab" \
     OPENHAB_HTTP_PORT="5000" \
     OPENHAB_HTTPS_PORT="5001" \
@@ -56,8 +54,7 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     tini \
-    gosu \
-    arping && \
+    gosu && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* #&& \
     #chmod +x /entrypoint.sh
@@ -71,7 +68,7 @@ WORKDIR ${OPENHAB_HOME}
 COPY --from=deploy-openhab /dist/openhab .
 
 # TODO: remove ${OPENHAB_HOME}/addons after testing
-VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_CERTIFICATES} ${OPENHAB_HOME}/addons ${OPENHAB_BACKUPS}
+VOLUME ${OPENHAB_HOME} ${OPENHAB_USERDATA} ${OPENHAB_CERTIFICATES} ${OPENHAB_HOME}/addons
 # Adapt ports	
 EXPOSE ${OPENHAB_HTTP_PORT} ${OPENHAB_HTTPS_PORT} ${OPENHAB_OPC_PORT} ${OPENHAB_OPC_SECURE_PORT} 8101 5007
 
