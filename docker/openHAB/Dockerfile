@@ -47,16 +47,6 @@ ENV \
     OPENHAB_CERTIFICATES="/openhab/certificates" \
     USER_ID="9001"
 
-ARG BUILD_DATE
-ARG VERSION
-
-LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.docker.dockerfile="/Dockerfile" \
-    org.label-schema.license="EPL-2.0" \
-    org.label-schema.vendor="Lotus GmbH & Co KG" \
-    org.label-schema.version=$VERSION \
-    maintainer="Tim Weber"
-
 #TODO: CHECK if possible
 #COPY entrypoint.sh /entrypoint.sh
 
